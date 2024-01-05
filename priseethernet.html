@@ -1,0 +1,78 @@
+<!DOCTYPE HTML> 
+<html>
+ <head>
+   <title>Prise ethernet</title>
+   <META content="text/html; charset=UTF-8;" http-equiv="Content-Type">
+   <link rel="stylesheet" href="priseethernet.css">
+ </head>
+ <body>
+    <div id="area"></div> 
+    <button onclick="retrecir()">Rétrécir l'objet</button>
+
+   <script src="three.min.js"></script>
+   <script src="OrbitControls.js"></script>
+   <script src="ColladaLoader.js"></script>
+   <script>
+      var renderer, scene, camera, controls, dae, defaultMaterial;
+
+      init();
+      animate();
+
+      function init() {
+         var fg = document.getElementById("area");
+
+         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+         camera.position.z = 1000;
+
+         renderer = new THREE.WebGLRenderer();
+         renderer.setClearColor(0x000000, 0);
+         renderer.setSize(window.innerWidth, window.innerHeight);
+         fg.appendChild(renderer.domElement);
+
+         controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+         scene = new THREE.Scene();
+
+         var loader = new THREE.ColladaLoader();
+         loader.options.convertUpAxis = true;
+         loader.load('prise_ethernet.dae', function (collada) {
+            dae = collada.scene;
+            defaultMaterial = new THREE.MeshPhongMaterial({ color: 0x535353 });
+            dae.traverse(function (child) {
+               if (child instanceof THREE.Mesh) {
+                  child.material = defaultMaterial;
+               }
+            });
+
+            dae.scale.set(400, 400, 400);
+            dae.position.set(0, 0, 0);
+            dae.updateMatrix();
+            scene.add(dae);
+         });
+      }
+
+      function animate() {
+         renderer.render(scene, camera);
+         requestAnimationFrame(function () {
+            animate();
+         });
+      }
+
+      var lumiere1 = new THREE.DirectionalLight(0xffffff);
+      lumiere1.position.set(100, 100, 100);
+      scene.add(lumiere1);
+
+      var lumiere2 = new THREE.DirectionalLight(0xffffff);
+      lumiere2.position.set(-70, -50, -100);
+      scene.add(lumiere2);
+      
+
+      var ambientLight = new THREE.AmbientLight(0x404040);
+      scene.add(ambientLight);
+
+      function retrecir() {
+         dae.scale.multiplyScalar(0.9);
+      }
+   </script>
+ </body>
+</html>
